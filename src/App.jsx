@@ -6,13 +6,13 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <div>
+    <main>
       {isLoggedIn ? (
-        <Dashboard />
+        <Dashboard onLogout={() => setIsLoggedIn(false)} />
       ) : (
         <LoginForm onLogin={() => setIsLoggedIn(true)} />
       )}
-    </div>
+    </main>
   );
 };
 
