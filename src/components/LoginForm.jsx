@@ -3,55 +3,83 @@ import InputField from "./InputField";
 import Button from "./Button";
 
 const LoginForm = ({ onLogin }) => {
+  // ES6 Destructuring for State
   const [credentials, setCredentials] = useState({
     username: "",
-    password: ""
+    password: "",
+  });
+  
+  const [status, setStatus] = useState({
+    error: false,
+    loading: false,
   });
 
-  const [error, setError] = useState(false);
-
-  const handleChange = ({ target: { name, value } }) => {
-    setCredentials({ ...credentials, [name]: value });
+  // Handle input changes dynamically
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
+    
+    // Interactive: Clear error message as soon as user starts typing again
+    if (status.error) setStatus((prev) => ({ ...prev, error: false }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setStatus((prev) => ({ ...prev, loading: true }));
 
-    const { username, password } = credentials;
+    // Mocking an API call with a 1.2s delay for a realistic feel
+    setTimeout(() => {
+      const { username, password } = credentials;
 
-    if (username === "admin" && password === "1234") {
-      setError(false);
-      onLogin();
-    } else {
-      setError(true);
-    }
+      if (username === "admin" && password === "1234") {
+        onLogin();
+      } else {
+        setStatus({ error: true, loading: false });
+      }
+    }, 1200);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
+    <div className={`card ${status.error ? "shake" : ""}`}>
+      <div className="login-header">
+        <h2>SkyLine</h2>
+        <p className="subtitle">Enterprise Analytics Gateway</p>
+      </div>
 
-      <InputField
-        name="username"
-        placeholder="Username"
-        value={credentials.username}
-        onChange={handleChange}
-        error={error}
-      />
+      <form onSubmit={handleSubmit} noValidate>
+        <InputField
+          name="username"
+          type="text"
+          placeholder="Username"
+          value={credentials.username}
+          onChange={handleChange}
+          error={status.error}
+        />
 
-      <InputField
-        name="password"
-        type="password"
-        placeholder="Password"
-        value={credentials.password}
-        onChange={handleChange}
-        error={error}
-      />
+        <InputField
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={credentials.password}
+          onChange={handleChange}
+          error={status.error}
+        />
 
-      {error && <p style={{ color: "red" }}>Invalid credentials</p>}
+        {status.error && (
+          <div className="error-container">
+            <p className="error-text">🔒 Invalid username or password</p>
+          </div>
+        )}
 
-      <Button text="Login" />
-    </form>
+        <Button 
+          text={status.loading ? "Verifying..." : "Sign In to Dashboard"} 
+        />
+      </form>
+
+      <div className="login-footer">
+        <p>Forgot password? <span className="link">Contact Admin</span></p>
+      </div>
+    </div>
   );
 };
 
